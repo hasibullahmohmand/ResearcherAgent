@@ -2,7 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from typing import List
 from pydantic import BaseModel, Field
-from Verifier import VerifierOutput
+from .Verifier import VerifierOutput
 
 class CitedOutput(BaseModel):
     paragraph: str = Field(description="The drafted text based on the paper.")

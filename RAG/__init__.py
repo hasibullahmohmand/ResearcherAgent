@@ -1,3 +1,3 @@
-from retriever import ArxivRAGService
+from .retriever import ArxivRAGService
 
 __all__ = [ArxivRAGService]
