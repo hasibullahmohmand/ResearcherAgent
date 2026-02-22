@@ -14,8 +14,8 @@ class ArxivRAGService:
             load_max_docs=4,
             load_all_available_meta=True,
             get_full_documents=True,
-            top_k_results=4,
-            doc_content_chars_max=50000,
+            top_k_results=1,
+            doc_content_chars_max=2000,
             continue_on_failure=True
         )
         self.embed_model = OllamaEmbeddings(model="nomic-embed-text")
@@ -38,11 +38,11 @@ class ArxivRAGService:
         )
         print(len(documents))
         print(seen_ids)
-        document_chunks = text_splitter.split_documents([doc])
+        document_chunks = text_splitter.split_documents(documents)
         
         return self.build_chromadb(document_chunks)
     
-    def build_chromadb(self, documents: List[Document], k: int =20, fetch_k: int =20):
+    def build_chromadb(self, documents: List[Document], k: int =10, fetch_k: int =10):
         
         chroma = Chroma.from_documents(
             documents=documents,

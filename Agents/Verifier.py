@@ -34,16 +34,16 @@ class Verifier:
 
             """),
             ("human",
-            """**User Query**: {question}
+            """**User Query**: {query}
             
-            **Response**: {answer}
+            **Response**: {response}
             
             **context**: {context}
             """)
         ])
   
         verify_chain = prompt | self.llm.with_structured_output(VerifierOutput)
-        response = verify_chain.invoke({"question":question, "answer":answer, "context":context})
+        response = verify_chain.invoke({"query":query, "response":response, "context":context})
         #print(f"Verification response: {response}")
         return response
 

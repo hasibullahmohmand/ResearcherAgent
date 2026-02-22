@@ -54,5 +54,5 @@ class Writer:
         
         writer_chain = prompt | self.llm.with_structured_output(WriterOutput)
         response = writer_chain.invoke({"user_query":user_query, "verified_drafts":verified_drafts})
-        
+        #print("writer: ", response)
         return response
