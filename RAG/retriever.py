@@ -1,24 +1,23 @@
 from typing import List
 from langchain_community.retrievers import ArxivRetriever
 from langchain_chroma import Chroma
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import SpacyTextSplitter
 from langchain_core.documents import Document
 from langchain_classic.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_ollama import OllamaEmbeddings
-from pathlib import Path
 
 class ArxivRAGService:
     def __init__(self):
         self.arxiv_retriever = ArxivRetriever(
-            load_max_docs=4,
+            load_max_docs=5,
             load_all_available_meta=True,
             get_full_documents=True,
-            top_k_results=1,
-            doc_content_chars_max=2000,
+            top_k_results=3,
+            doc_content_chars_max=50000,
             continue_on_failure=True
         )
-        self.embed_model = OllamaEmbeddings(model="nomic-embed-text")
+        self.embed_model = OllamaEmbeddings(model="embeddinggemma")
 
     def build_retriever(self,search_queries: List[str]) -> EnsembleRetriever:
         seen_ids = set()
@@ -31,9 +30,9 @@ class ArxivRAGService:
                 if doc_id not in seen_ids:
                     seen_ids.add(doc_id)
                     documents.append(doc)
-                
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
+        
+        text_splitter = SpacyTextSplitter(
+            chunk_size=2000,
             chunk_overlap=200
         )
         print(len(documents))
@@ -42,17 +41,16 @@ class ArxivRAGService:
         
         return self.build_chromadb(document_chunks)
     
-    def build_chromadb(self, documents: List[Document], k: int =10, fetch_k: int =10):
+    def build_chromadb(self, documents: List[Document], k: int=20, fetch_k: int=20):
         
         chroma = Chroma.from_documents(
             documents=documents,
             embedding=self.embed_model,
-            persist_directory=str(Path.cwd() / "temp")
             )
         chroma_retriever = chroma.as_retriever(search_type="mmr", search_kwargs={"k":k, "fetch_k":fetch_k})
         bm25_retriever = BM25Retriever.from_documents(documents, k=k, fetch_k=fetch_k)
         
-        return EnsembleRetriever(retrievers=[chroma_retriever,bm25_retriever], weights=[0.4,0.6])    
+        return EnsembleRetriever(retrievers=[chroma_retriever,bm25_retriever], weights=[0.5,0.5])    
 
 if __name__ == "__main__":
     r_service = ArxivRAGService()

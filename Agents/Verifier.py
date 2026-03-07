@@ -15,7 +15,8 @@ class Verifier:
     def __init__(self):
         self.llm = ChatOllama(model="llama3.2", temperature=0)
         
-    def verify(self, query:str, response:str, context:List[str]) -> VerifierOutput:
+    def verify(self, query:str, response:str, documents:List[str]) -> VerifierOutput:
+        context = "\n".join(documents)
         prompt = ChatPromptTemplate.from_messages([
             ("system",
             """
@@ -38,13 +39,13 @@ class Verifier:
             
             **Response**: {response}
             
-            **context**: {context}
+            **Context**: {context}
             """)
         ])
   
         verify_chain = prompt | self.llm.with_structured_output(VerifierOutput)
         response = verify_chain.invoke({"query":query, "response":response, "context":context})
-        #print(f"Verification response: {response}")
+        print(f"Verification response: {response}")
         return response
 
 if __name__ == "__main__":

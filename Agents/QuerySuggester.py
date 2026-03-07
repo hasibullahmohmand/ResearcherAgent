@@ -16,19 +16,12 @@ class QuerySuggester:
             ("system",
              """You are an academic researcher specialized in information retrieval.
 
-                Generate exactly 3 diverse, formal academic search queries and exactly 1 concise reformulated research question based on the input.
+                Generate exactly 3 diverse, formal academic search queries and exactly 1 concise reformulated research query based on the user query.
 
                 Rules:
                 - Each search query must focus on a different conceptual angle.
-                - If the input does not specify a domain, preserve breadth and avoid assuming one.
-                - Use precise academic terminology.
                 - Avoid generic or overly short phrases.
                 - Do NOT include explanations, brackets, or meta commentary.
-                
-                The optimized_user_query must:
-                - Be a full, formal academic research question or title.
-                - Not be shorter than 6 words.
-                - Not introduce a narrower scope than the original input.
                 """),
             ("human",
              """**User Query**: {user_query}
@@ -37,11 +30,11 @@ class QuerySuggester:
         
         research_chain = prompt | self.llm.with_structured_output(QueryOutput)
         response = research_chain.invoke({"user_query":user_query})
-        #print("Queries:", response)
+        print("Queries:", response)
         return response
     
 if __name__ == "__main__":
-    user_query = "can you wrtie me a topic about transformers"
+    user_query = "can you write a topic about the impact of transformer models in image classification?"
     r = QuerySuggester()
     response = r.research(user_query)
-    print(response)
+    #print(response)
