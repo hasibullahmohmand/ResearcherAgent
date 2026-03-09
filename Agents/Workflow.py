@@ -142,12 +142,9 @@ class PaperWorkflow:
         response = self.relevance_checker.check(state["user_query"],top_k_chunks)
         
         if response in ["CAN_ANSWER", "PARTIAL"]:
-            return {"is_relevant": True,}
+            return {"is_relevant": True}
         elif response == "NO_MATCH":
-            return {
-                "is_relevant": False,
-                "draft_response": "This question isn't related (or there's no data) for your query. Please ask another question relevant to the uploaded document(s)."
-            }
+            return {"is_relevant": False}
     
     def is_relevance(self, state: PaperState):
         if state["is_relevant"]:
@@ -170,9 +167,7 @@ class PaperWorkflow:
         if not state["verification_report"]:
             response = self.researcher.research(state["user_query"],documents)
         else:   
-            result = self.researcher.re_research(state["user_query"], documents, state["draft"].draft_text, state["verification_report"])
-            response = state["draft"]
-            response.draft_text = result
+            response = self.researcher.re_research(state["user_query"], documents, state["draft"].draft_text, state["verification_report"])
             
         draft = CitedOutput(draft_text=response, full_reference=citation)
         return {"draft": draft}
